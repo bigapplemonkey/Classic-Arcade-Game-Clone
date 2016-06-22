@@ -1,0 +1,98 @@
+body {
+    text-align: center;
+    font-family: 'Press Start 2P', cursive;
+    color: #FF7F00;
+    font-size: 13px;
+}
+
+canvas {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background: transparent;
+}
+
+img {
+    max-width: 32px;
+}
+
+button {
+    position: fixed;
+    width: 150px;
+    height: 150px;
+    top: 460px;
+    left: 50px;
+}
+
+.dead {
+    -webkit-filter: grayscale(100%);
+    /* Chrome, Safari, Opera */
+    filter: grayscale(100%);
+}
+
+#background {
+    z-index: -3;
+}
+
+#parallBackground {
+    z-index: -4;
+}
+
+#prize {
+    z-index: -2;
+}
+
+#main {
+    z-index: -1;
+}
+
+#ship {
+    z-index: 0;
+}
+
+.score {
+    position: absolute;
+    top: 8px;
+    left: 400px;
+    cursor: default;
+}
+
+.level {
+    position: absolute;
+    top: 8px;
+    left: 590px;
+    cursor: default;
+}
+
+.lifes {
+    position: absolute;
+    top: 8px;
+    left: 20px;
+    cursor: default;
+}
+
+.game-over {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 720px;
+    height: 432px;
+    color: #FF7F00;
+    font-family: Helvetica, sans-serif;
+    font-size: 30px;
+    cursor: default;
+    display: none;
+    background: white;
+    /*opacity: 0.1;*/
+}
+
+.game-over span {
+    font-size: 20px;
+    cursor: pointer;
+    position: relative;
+    left: 50px;
+}
+
+.game-over span:hover {
+    color: #FFD700;
+}
