@@ -360,7 +360,7 @@ Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
     this.y = y;
 
     this.finalSpeed = speed;
-    this.speed = 125;
+    this.speed = 400;
     this.speedX = 0;
     this.speedY = speed;
 
@@ -400,6 +400,7 @@ Enemy.prototype.draw = function(dt) {
     }
 
     if (this.verticalMoving && this.y >= this.startBottomEdge) {
+         console.log("here");
         this.speed = this.finalSpeed;
         this.speedY = 6;
         this.y -= 5;
