@@ -92,7 +92,7 @@ var Engine = (function(global) {
         }
 
         // Initializes the 5 canvas in canvasIDs
-        var screenContainer = doc.getElementById("screen-container");
+        var gameContainer = doc.getElementById("game-container");
         for (var i in canvasIDs) {
             var canvas = doc.createElement('canvas');
             ctxs[canvasIDs[i]] = canvas.getContext('2d');
@@ -100,7 +100,7 @@ var Engine = (function(global) {
             canvas.width = canvasWidth;
             canvas.height = canvasHeight;
             canvas.innerHTML = i == 0 ? 'Your browser does not support canvas. Please try again with a different browser.' : ''
-            screenContainer.appendChild(canvas);
+            gameContainer.appendChild(canvas);
         }
 
         // Caches the life images
@@ -113,10 +113,16 @@ var Engine = (function(global) {
     }
 
     function checkReadyState() {
-        if (true) { //gameOverAudio.readyState === 4 &&
+        var isAudioReady = true;
+        for (var key in variousSoundsPool) {
+            if(variousSoundsPool[key].readyState !== 4) isAudioReady = false;
+        }
+
+        if (isAudioReady) { //gameOverAudio.readyState === 4 &&
             window.clearInterval(checkAudio);
             reset();
             lastTime = Date.now();
+            doc.getElementById('progress-screen').style.display = "none";
             main();
         }
     }

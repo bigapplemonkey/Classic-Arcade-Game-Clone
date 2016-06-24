@@ -6,22 +6,29 @@
     <title>Effective JavaScript: Frogger</title>
     <link href='https://fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://use.fontawesome.com/957adda781.js"></script>
 </head>
 
 <body>
     <div class="full-screen center">
         <div class="screen-border center">
             <div class="screen-container center" id="screen-container">
-                <div class="lifes">
-                    <img id="life1" class="" src="images/ship.png" alt="Player life">
-                    <img id="life2" class="" src="images/ship.png" alt="Player life">
-                    <img id="life3" class="" src="images/ship.png" alt="Player life">
+                <div id="progress-screen" class="progress-screen">
+                    <i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+                    <div class="loading-text">Loading...</div>
                 </div>
-                <div class="score">SCORE: <span id="score"></span></div>
-                <div class="level">LEVEL: <span id="level"></span></div>
-                <div class="game-over" id="game-over">
-                    <h4>GAME OVER</h4>
-                    <button id="restart">Restart</button>
+                <div id="game-container" class="game-container">
+                    <div class="lifes">
+                        <img id="life1" class="" src="images/ship.png" alt="Player life">
+                        <img id="life2" class="" src="images/ship.png" alt="Player life">
+                        <img id="life3" class="" src="images/ship.png" alt="Player life">
+                    </div>
+                    <div class="score">SCORE: <span id="score"></span></div>
+                    <div class="level">LEVEL: <span id="level"></span></div>
+                    <div class="game-over" id="game-over">
+                        <h4>GAME OVER</h4>
+                        <button id="restart">Restart</button>
+                    </div>
                 </div>
             </div>
         </div>
