@@ -360,7 +360,7 @@ Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
     this.y = y;
 
     this.finalSpeed = speed;
-    this.speed = 400;
+    this.speed = 125;
     this.speedX = 0;
     this.speedY = speed;
 

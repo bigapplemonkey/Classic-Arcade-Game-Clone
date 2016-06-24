@@ -92,6 +92,7 @@ var Engine = (function(global) {
         }
 
         // Initializes the 5 canvas in canvasIDs
+        var screenContainer = doc.getElementById("screen-container");
         for (var i in canvasIDs) {
             var canvas = doc.createElement('canvas');
             ctxs[canvasIDs[i]] = canvas.getContext('2d');
@@ -99,7 +100,7 @@ var Engine = (function(global) {
             canvas.width = canvasWidth;
             canvas.height = canvasHeight;
             canvas.innerHTML = i == 0 ? 'Your browser does not support canvas. Please try again with a different browser.' : ''
-            doc.body.appendChild(canvas);
+            screenContainer.appendChild(canvas);
         }
 
         // Caches the life images
