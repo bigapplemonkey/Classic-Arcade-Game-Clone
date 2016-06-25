@@ -194,7 +194,9 @@ Prize.prototype.constructor = Prize;
 
 Prize.prototype.spawn = function(speed) {
     var margin = this.canvasWidth * 0.06;
-    this.x = Math.floor(Math.random() * (this.canvasWidth - margin) + margin);
+    var minX = margin;
+    var maxX = this.canvasWidth - margin;
+    this.x = Math.floor(Math.random() * (maxX - minX + 1) + minX);
     this.y = -100;
     this.speed = speed;
 };
@@ -378,8 +380,10 @@ Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
     this.percentFire = fireRate;
 
     if (type === "big") {
-        var margin = this.canvasWidth * 0.15;
-        this.x = Math.floor(Math.random() * (this.canvasWidth - margin)) + margin;
+        var margin = this.canvasWidth * 0.06;
+        var minX = margin;
+        var maxX = this.canvasWidth - margin;
+        this.x = Math.floor(Math.random() * (maxX - minX + 1) + minX);
         this.type = 'big';
         this.leftEdge = 10
         this.rightEdge = this.canvasWidth - (2 * this.width) - 10;
@@ -400,7 +404,7 @@ Enemy.prototype.draw = function(dt) {
     }
 
     if (this.verticalMoving && this.y >= this.startBottomEdge) {
-         console.log("here");
+        console.log("here");
         this.speed = this.finalSpeed;
         this.speedY = 6;
         this.y -= 5;
