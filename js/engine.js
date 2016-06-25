@@ -52,7 +52,6 @@ var Engine = (function(global) {
      * and handles properly calling the update and render methods.
      */
     function main() {
-        if (lifes > 0) requestAnimFrame(main);
         /* Get our time delta information which is required if your game
          * requires smooth animation. Because everyone's computer processes
          * instructions at different speeds we need a constant value that
@@ -72,6 +71,12 @@ var Engine = (function(global) {
          * for the next time this function is called.
          */
         lastTime = now;
+
+        if (lifes < 1) return;
+         /* Use the browser's requestAnimationFrame function to call this
+         * function again as soon as the browser is able to draw another frame.
+         */
+         requestAnimFrame(main);
 
     }
 
@@ -122,8 +127,9 @@ var Engine = (function(global) {
             window.clearInterval(checkAudio);
             reset();
             lastTime = Date.now();
-            doc.getElementById('progress-screen').style.display = "none";
-            main();
+            doc.getElementById('loading').style.display = "none";
+            doc.getElementById('instructions').style.display = "block";
+            // main();
         }
     }
 
@@ -167,11 +173,6 @@ var Engine = (function(global) {
         quadTree.insert(prize);
         quadTree.insert(enemyBulletPool.getPool());
         detectCollision(dt);
-
-        /* Use the browser's requestAnimationFrame function to call this
-         * function again as soon as the browser is able to draw another frame.
-         */
-
     }
 
     function detectCollision(dt) {
@@ -316,6 +317,13 @@ var Engine = (function(global) {
 
     doc.getElementById("restart").onclick = function() {
         document.getElementById('game-over').style.display = "none";
+        reset();
+        lastTime = Date.now();
+        main();
+    };
+
+    doc.getElementById("start").onclick = function() {
+        document.getElementById('progress-screen').style.display = "none";
         reset();
         lastTime = Date.now();
         main();
