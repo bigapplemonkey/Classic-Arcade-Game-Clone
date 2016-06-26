@@ -375,8 +375,8 @@ Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
     this.speedX = 0;
     this.speedY = speed;
 
-    this.leftEdge = this.x - 100;
-    this.rightEdge = this.x + 60;
+    this.leftEdge = this.x + (this.width / 2) - 80;
+    this.rightEdge = this.x + (this.width / 2) + 80;
 
     this.startBottomEdge = this.y + 170;
     this.endBottomEdge = this.y + 300
@@ -401,8 +401,8 @@ Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
         var maxX = this.canvasWidth - margin;
         this.x = Math.floor(Math.random() * (maxX - minX + 1) + minX);
         this.type = 'big';
-        this.leftEdge = 10
-        this.rightEdge = this.canvasWidth - (2 * this.width) - 10;
+        this.leftEdge = 15 + (this.width / 2);
+        this.rightEdge = this.canvasWidth - 15 - (this.width / 2);
     }
 };
 
@@ -414,8 +414,8 @@ Enemy.prototype.draw = function(dt) {
     // Move vertically
     if (this.y <= this.endBottomEdge) this.y += this.speedY * dt;
 
-    if (this.x <= this.leftEdge) this.speedX = this.speed;
-    else if (this.x >= this.rightEdge + this.width) {
+    if (this.x + (this.width / 2) <= this.leftEdge) this.speedX = this.speed;
+    else if (this.x + (this.width / 2) >= this.rightEdge) {
         this.speedX = -this.speed;
     }
 

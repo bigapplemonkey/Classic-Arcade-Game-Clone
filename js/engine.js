@@ -11,7 +11,7 @@
  *
  * This engine is available globally via the Engine variable and it also makes
  * the canvas' context (ctx) object globally available to make writing app.js
- * a little simpler to work with.
+ * a little simpler to work with. 495 530
  */
 
 var laserPool, backgroundAudio, gameOverAudio, checkAudio, ship;
@@ -261,7 +261,7 @@ var Engine = (function(global) {
         var height = enemyPool.pool[0].height;
         var width = enemyPool.pool[0].width;
 
-        var x = 120;
+        var x = 95;
         var y = -height;
         var spacer = y * 1.5;
         var speed = level1Config.enemySpeed;
@@ -271,9 +271,9 @@ var Engine = (function(global) {
         } else {
             for (var i = 1; i <= 24; i++) {
                 enemyPool.get(x, y, speed, "small", level1Config.smallEnemyFireRate, 0);
-                x += width + 24;
+               x += width + 30;
                 if (i % 8 == 0) {
-                    x = 120;
+                    x = 95;
                     y += spacer
                 }
             }
@@ -300,12 +300,11 @@ var Engine = (function(global) {
         if (gameIteration > 0) {
             if (prize.draw(dt)) {
                 if (prize.isColliding) prize.y = 900;
-                var chance = (Math.floor(Math.random() * 1500));
-                // console.log(chance);
+                var chance = (Math.floor(Math.random() * 1600));
                 if (chance <= 1 && lifes < 3) {
                     prize = new Prize(0, 0, ctxs.prize, true);
                     prize.spawn(speed);
-                } else if (chance < 6) {
+                } else if (chance < 5) {
                     prize = new Prize(0, 0, ctxs.prize, false);
                     prize.spawn(speed);
                 }
