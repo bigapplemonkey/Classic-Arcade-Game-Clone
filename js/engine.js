@@ -271,7 +271,7 @@ var Engine = (function(global) {
         } else {
             for (var i = 1; i <= 24; i++) {
                 enemyPool.get(x, y, speed, "small", level1Config.smallEnemyFireRate, 0);
-                x += width + 23;
+                x += width + 24;
                 if (i % 8 == 0) {
                     x = 120;
                     y += spacer
@@ -300,11 +300,12 @@ var Engine = (function(global) {
         if (gameIteration > 0) {
             if (prize.draw(dt)) {
                 if (prize.isColliding) prize.y = 900;
-                var chance = (Math.floor(Math.random() * 1500
+                var chance = (Math.floor(Math.random() * 1500));
+                // console.log(chance);
                 if (chance <= 1 && lifes < 3) {
                     prize = new Prize(0, 0, ctxs.prize, true);
                     prize.spawn(speed);
-                } else if (chance < 5) {
+                } else if (chance < 6) {
                     prize = new Prize(0, 0, ctxs.prize, false);
                     prize.spawn(speed);
                 }

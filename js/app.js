@@ -375,8 +375,8 @@ Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
     this.speedX = 0;
     this.speedY = speed;
 
-    this.leftEdge = this.x - 80;
-    this.rightEdge = this.x + 80;
+    this.leftEdge = this.x - 100;
+    this.rightEdge = this.x + 60;
 
     this.startBottomEdge = this.y + 170;
     this.endBottomEdge = this.y + 300
