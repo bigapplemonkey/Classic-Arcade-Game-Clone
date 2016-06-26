@@ -41,7 +41,7 @@ var Engine = (function(global) {
         level1InitialConfig,
         canvasIDs = ['parallBackground', 'background', 'prize', 'main', 'spaceship'],
         variousSounds = { prizeSound: .3, gameOverSound: .3, levelUp: .6 },
-        difficultyLevels = { easy: 0.05, medium: 0.3, difficult: 0.45 },
+        difficultyLevels = { easy: 0.02, medium: 0.3, difficult: 0.45 },
         variousSoundsPool = {},
         canvasWidth = 720,
         canvasHeight = 432,
@@ -72,11 +72,16 @@ var Engine = (function(global) {
          */
         lastTime = now;
 
+        if (timeIdle > 10) {
+            doc.getElementById('progress-screen').style.display = "block";
+            return;
+        }
+
         if (lifes < 1) return;
-         /* Use the browser's requestAnimationFrame function to call this
+        /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-         requestAnimFrame(main);
+        requestAnimFrame(main);
 
     }
 
@@ -120,7 +125,7 @@ var Engine = (function(global) {
     function checkReadyState() {
         var isAudioReady = true;
         for (var key in variousSoundsPool) {
-            if(variousSoundsPool[key].readyState !== 4) isAudioReady = false;
+            if (variousSoundsPool[key].readyState !== 4) isAudioReady = false;
         }
 
         if (isAudioReady) { //gameOverAudio.readyState === 4 &&
@@ -134,9 +139,7 @@ var Engine = (function(global) {
     }
 
     function gameOver() {
-        // backgroundAudio.pause();
-        // gameOverAudio.currentTime = 0;
-        // gameOverAudio.play();
+        variousSoundsPool.gameOverSound.play();
         doc.getElementById('game-over').style.display = "block";
     }
 
@@ -213,8 +216,7 @@ var Engine = (function(global) {
                 ship = new Ship(canvasWidth / 2, canvasHeight / 4 * 3, ctxs.spaceship, ctxs.main);
                 ship.draw();
             } else {
-                variousSoundsPool.gameOverSound.play();
-                doc.getElementById('game-over').style.display = "block";
+                gameOver();
             }
         } else if (collidingObjects.indexOf("bullet") > -1) {
             score += 100;
@@ -259,19 +261,19 @@ var Engine = (function(global) {
         var height = enemyPool.pool[0].height;
         var width = enemyPool.pool[0].width;
 
-        var x = 100;
+        var x = 120;
         var y = -height;
         var spacer = y * 1.5;
         var speed = level1Config.enemySpeed;
 
         if (gameIteration % levelIterations === 0) {
-            enemyPool.get(x, y, speed, "big", level1Config.bigEnemyFireRate, level1Config.bigEnemyLifes);
+            enemyPool.get(x, -100, speed, "big", level1Config.bigEnemyFireRate, level1Config.bigEnemyLifes);
         } else {
             for (var i = 1; i <= 24; i++) {
                 enemyPool.get(x, y, speed, "small", level1Config.smallEnemyFireRate, 0);
-                x += width + 25;
+                x += width + 23;
                 if (i % 8 == 0) {
-                    x = 100;
+                    x = 120;
                     y += spacer
                 }
             }
@@ -286,11 +288,10 @@ var Engine = (function(global) {
             level1Config.prizeSpeed = (difficultyLevels.easy + 1) * level1Config.prizeSpeed;
             level1Config.enemySpeed = (difficultyLevels.easy + 1) * level1Config.enemySpeed;
             level1Config.smallEnemyFireRate = level1Config.smallEnemyFireRate + 1;
-            level1Config.bigEnemyFireRate = level1Config.bigEnemyFireRate + 2;
-            level1Config.bigEnemyLifes = level1Config.bigEnemyLifes + 2;
+            level1Config.bigEnemyFireRate = level1Config.bigEnemyFireRate + 3;
+            level1Config.bigEnemyLifes = level1Config.bigEnemyLifes + 3;
 
         }
-        console.log(level1Config);
     }
 
     // Spawn a new wave of enemies
@@ -299,8 +300,7 @@ var Engine = (function(global) {
         if (gameIteration > 0) {
             if (prize.draw(dt)) {
                 if (prize.isColliding) prize.y = 900;
-                var chance = (Math.floor(Math.random() * 601));
-                // console.log(chance);
+                var chance = (Math.floor(Math.random() * 1500
                 if (chance <= 1 && lifes < 3) {
                     prize = new Prize(0, 0, ctxs.prize, true);
                     prize.spawn(speed);
@@ -316,14 +316,14 @@ var Engine = (function(global) {
     }
 
     doc.getElementById("restart").onclick = function() {
-        document.getElementById('game-over').style.display = "none";
+        doc.getElementById('game-over').style.display = "none";
         reset();
         lastTime = Date.now();
         main();
     };
 
     doc.getElementById("start").onclick = function() {
-        document.getElementById('progress-screen').style.display = "none";
+        doc.getElementById('progress-screen').style.display = "none";
         reset();
         lastTime = Date.now();
         main();
@@ -446,6 +446,7 @@ var Engine = (function(global) {
         // backgroundAudio.currentTime = 0;
 
         ship.draw();
+        timeIdle = 0;
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -460,7 +461,10 @@ var Engine = (function(global) {
         'images/ship.png',
         'images/enemy.png',
         'images/enemy6.png',
-        'images/enemy7.png'
+        'images/enemy7.png',
+        'images/bossEnemy1.png',
+        'images/bossEnemy2.png',
+        'images/bossEnemy3.png'
     ]);
     Resources.onReady(init);
 

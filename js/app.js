@@ -1,16 +1,20 @@
+var bossEnemySprites = ["bossEnemy1", "bossEnemy2", "bossEnemy3"];
+var timeIdle = 0;
+setInterval(function() { timeIdle += 2; }, 2000);
+
 // Drawable object
 var Drawable = function(x, y, context, spriteString, speed, collidableWith, type) {
     //location of the image
     this.x = x;
     this.y = y;
 
-    //sprite and canvas context
+    //canvas context
     this.context = context;
     this.sprite = Resources.get(spriteString);
 
     this.speed = speed;
 
-    //image width/height used for collision detection
+    //sprite and image width/height used for collision detection
     this.width = this.sprite.width;
     this.height = this.sprite.height;
 
@@ -304,8 +308,8 @@ Ship.prototype.move = function(dt) {
 
 // Fires two bullets
 Ship.prototype.fire = function() {
-    this.bulletPool.getTwo(this.x + 6, this.y, 175,
-        this.x + 33, this.y, 175);
+    this.bulletPool.getTwo(this.x + 3, this.y, 175,
+        this.x + 40, this.y, 175);
     laserPool.get();
 };
 
@@ -358,6 +362,11 @@ Enemy.prototype.constructor = Enemy;
 
 // Enemy values
 Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
+    this.sprite = Resources.get('images/enemy.png');
+
+    this.width = this.sprite.width;
+    this.height = this.sprite.height;
+
     this.x = x;
     this.y = y;
 
@@ -369,7 +378,7 @@ Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
     this.leftEdge = this.x - 80;
     this.rightEdge = this.x + 80;
 
-    this.startBottomEdge = this.y + 150;
+    this.startBottomEdge = this.y + 170;
     this.endBottomEdge = this.y + 300
 
     this.verticalMoving = true;
@@ -380,6 +389,13 @@ Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
     this.percentFire = fireRate;
 
     if (type === "big") {
+        var sprite = bossEnemySprites.pop();
+        this.sprite = Resources.get('images/' + sprite + '.png');
+        bossEnemySprites.unshift(sprite);
+
+        this.width = this.sprite.width;
+        this.height = this.sprite.height;
+
         var margin = this.canvasWidth * 0.06;
         var minX = margin;
         var maxX = this.canvasWidth - margin;
@@ -404,7 +420,6 @@ Enemy.prototype.draw = function(dt) {
     }
 
     if (this.verticalMoving && this.y >= this.startBottomEdge) {
-        console.log("here");
         this.speed = this.finalSpeed;
         this.speedY = 6;
         this.y -= 5;
@@ -724,6 +739,7 @@ for (code in KEY_CODES) {
  * key it was.
  */
 document.onkeydown = function(e) {
+        timeIdle = 0;
         // Firefox and opera use charCode instead of keyCode to
         // return which key was pressed.
         var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
