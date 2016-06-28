@@ -1,8 +1,13 @@
-var bossEnemySprites = ["bossEnemy1", "bossEnemy2", "bossEnemy3"];
+// TODO: add all JSDoc documentation
+
+// Some global variables
+var bossEnemySprites = ['bossEnemy1', 'bossEnemy2', 'bossEnemy3'];
 var timeIdle = 0;
+
+// Add time if game is idle
 setInterval(function() { timeIdle += 2; }, 2000);
 
-// Drawable object
+// Drawable object, all moving objects inherit from this Drawable
 var Drawable = function(x, y, context, spriteString, speed, collidableWith, type) {
     //location of the image
     this.x = x;
@@ -33,6 +38,7 @@ Drawable.prototype.draw = function() {};
 
 Drawable.prototype.move = function() {};
 
+
 Drawable.prototype.isCollidableWith = function(object) {
     return (this.isCollidableWith === object.type);
 };
@@ -41,6 +47,8 @@ Drawable.prototype.isCollidableWith = function(object) {
 var Background = function(x, y, bgContext, parallel) {
     var spriteString = 'images/background.png';
     var speed = 40;
+
+    // For parallel background
     if (parallel === true) {
         speed = 25;
         spriteString = 'images/parallelBackground.png';
@@ -48,7 +56,7 @@ var Background = function(x, y, bgContext, parallel) {
 
     Drawable.call(this, x, y, bgContext, spriteString, speed);
     this.parallel = parallel;
-}
+};
 
 Background.prototype = Object.create(Drawable.prototype);
 
@@ -56,19 +64,20 @@ Background.prototype.constructor = Background;
 
 // Implement abstract function
 Background.prototype.draw = function(dt) {
-
     this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     this.y += this.speed * dt;
-    this.context.drawImage(this.sprite, this.x, this.y);
 
+    // Draw background image one on top of the other for continuity
+    this.context.drawImage(this.sprite, this.x, this.y);
     this.context.drawImage(this.sprite, this.x, this.y - this.height + 2);
 
+    // Draw parallel background image one on top of the other for continuity
     if (!this.parallel) {
         this.context.drawImage(this.sprite, this.width - 2, this.y);
         this.context.drawImage(this.sprite, this.width, this.y - this.height);
     }
 
-    if (this.y >= this.height) this.y = 0;
+    if (this.y >= this.height) { this.y = 0; }
 };
 
 // Pool object. Holds bullet and enemy objects to to prevent garbage collection
@@ -83,9 +92,9 @@ var Pool = function(maxSize, objectContext, object) {
             pool[i] = bullet;
         }
     } else if (object === 'enemy') {
-        for (var i = 0; i < this.size; i++) {
+        for (var j = 0; j < this.size; j++) {
             var enemy = new Enemy(objectContext);
-            pool[i] = enemy;
+            pool[j] = enemy;
         }
     }
     this.pool = pool;
@@ -94,8 +103,8 @@ var Pool = function(maxSize, objectContext, object) {
 // Grabs the last item in the list, initializes it and pushes it to the front
 Pool.prototype.get = function(x, y, speed, type, fireRate, lifes) {
     if (!this.pool[this.size - 1].alive) {
-        if (typeof type !== "undefined") {
-            this.pool[this.size - 1].spawn(x, y, speed, type, fireRate, lifes)
+        if (typeof type !== 'undefined') {
+            this.pool[this.size - 1].spawn(x, y, speed, type, fireRate, lifes);
         } else {
             this.pool[this.size - 1].spawn(x, y, speed);
         }
@@ -112,7 +121,7 @@ Pool.prototype.getTwo = function(x1, y1, speed1, x2, y2, speed2) {
     }
 };
 
-//Draws in use bullets, and clears bullet off the screen
+// Draws in use bullets, and clears bullet off the screen
 Pool.prototype.animate = function(dt) {
     for (var i = 0; i < this.size; i++) {
         // Only draw until we find a bullet that is not alive
@@ -121,8 +130,9 @@ Pool.prototype.animate = function(dt) {
                 this.pool[i].clear();
                 this.pool.push((this.pool.splice(i, 1))[0]);
             }
-        } else
+        } else {
             break;
+        }
     }
 };
 
@@ -135,13 +145,13 @@ Pool.prototype.getPool = function() {
         }
     }
     return obj;
-}
+};
 
 // Bullet object
 var Bullet = function(x, y, bulletContext, object) {
     this.self = object;
     var spriteString = 'images/' + object + '.png';
-    var collidableWith = object === "bullet" ? "enemy" : "ship";
+    var collidableWith = object === 'bullet' ? 'enemy' : 'ship';
 
     Drawable.call(this, x, y, bulletContext, spriteString, 0, collidableWith, object);
     this.alive = false; // True if the bullet is currently in use
@@ -151,7 +161,7 @@ Bullet.prototype = Object.create(Drawable.prototype);
 
 Bullet.prototype.constructor = Bullet;
 
-//bullet values
+// Bullet values
 Bullet.prototype.spawn = function(x, y, speed) {
     this.x = x;
     this.y = y;
@@ -163,6 +173,7 @@ Bullet.prototype.spawn = function(x, y, speed) {
 Bullet.prototype.draw = function(dt) {
     this.context.clearRect(this.x - 1, this.y - 1, this.width + 1, this.height + 1);
     this.y -= this.speed * dt;
+
     if (this.isColliding || (this.self === 'bullet' && this.y <= 0 - this.height) ||
         (this.self === 'enemyBullet' && this.y >= this.canvasHeight)) {
         return true;
@@ -186,22 +197,25 @@ Bullet.prototype.clear = function() {
 
 // Prize object
 var Prize = function(x, y, bulletContext, extraLife) {
-    var spriteString = 'images/enemy6.png';
+    var spriteString = 'images/spaceman.png';
     this.extraLife = false;
+
     if (extraLife === true) {
         this.extraLife = true;
-        var spriteString = 'images/enemy7.png';
+        spriteString = 'images/life.png';
     }
-    Drawable.call(this, x, y, bulletContext, spriteString, 80, "ship", "prize");
+    Drawable.call(this, x, y, bulletContext, spriteString, 80, 'ship', 'prize');
 };
 
 Prize.prototype = Object.create(Drawable.prototype);
+
 Prize.prototype.constructor = Prize;
 
 Prize.prototype.spawn = function(speed) {
     var margin = this.canvasWidth * 0.06;
     var minX = margin;
     var maxX = this.canvasWidth - margin;
+
     this.x = Math.floor(Math.random() * (maxX - minX + 1) + minX);
     this.y = -100;
     this.speed = speed;
@@ -210,6 +224,7 @@ Prize.prototype.spawn = function(speed) {
 Prize.prototype.draw = function(dt) {
     this.context.clearRect(this.x, this.y - 1, this.width, this.height + 1);
     this.y += this.speed * dt;
+
     if (this.isColliding || this.y >= this.canvasHeight) {
         return true;
     } else {
@@ -232,12 +247,12 @@ var SoundPool = function(maxSize, object) {
     this.size = maxSize; // Max sounds allowed in the pool
     this.pool = [];
     this.currSound = 0;
-    var soundString = "sounds/" + object + ".mp3";
+    var soundString = 'sounds/' + object + '.mp3';
 
     // Populates the pool array with the given sound
     for (var i = 0; i < this.size; i++) {
         var sound = new Audio(soundString);
-        sound.volume = .20;
+        sound.volume = 0.2;
         sound.load();
         this.pool[i] = sound;
     }
@@ -245,7 +260,7 @@ var SoundPool = function(maxSize, object) {
 
 // Plays a sound
 SoundPool.prototype.get = function() {
-    if (this.pool[this.currSound].currentTime == 0 || this.pool[this.currSound].ended) {
+    if (this.pool[this.currSound].currentTime === 0 || this.pool[this.currSound].ended) {
         this.pool[this.currSound].play();
     }
     this.currSound = (this.currSound + 1) % this.size;
@@ -255,7 +270,7 @@ SoundPool.prototype.get = function() {
 var Ship = function(x, y, shipContext, bulletContext) {
     var spriteString = 'images/ship.png';
 
-    Drawable.call(this, x, y, shipContext, spriteString, 200, "enemyBullet", "ship");
+    Drawable.call(this, x, y, shipContext, spriteString, 200, 'enemyBullet', 'ship');
     this.x = this.x - (this.width / 2);
     this.y = this.y + (this.height * 2);
     this.bulletPool = new Pool(30, bulletContext, 'bullet');
@@ -283,24 +298,27 @@ Ship.prototype.move = function(dt) {
         if (KEY_STATUS.left) {
             this.x -= this.speed * dt;
             if (this.x <= 0) // Keep player within the screen
-                this.x = 0;
+            { this.x = 0; }
         } else if (KEY_STATUS.right) {
             this.x += this.speed * dt;
-            if (this.x >= this.canvasWidth - this.width)
+            if (this.x >= this.canvasWidth - this.width) {
                 this.x = this.canvasWidth - this.width;
+            }
         } else if (KEY_STATUS.up) {
             this.y -= this.speed * dt;
-            if (this.y <= this.canvasHeight / 4 * 3)
+            if (this.y <= this.canvasHeight / 4 * 3) {
                 this.y = this.canvasHeight / 4 * 3;
+            }
         } else if (KEY_STATUS.down) {
             this.y += this.speed * dt;
-            if (this.y >= this.canvasHeight - this.height)
+            if (this.y >= this.canvasHeight - this.height) {
                 this.y = this.canvasHeight - this.height;
+            }
         }
         // Finish by redrawing the ship
         if (!this.isColliding) {
             this.draw();
-        } else this.alive = false;
+        } else { this.alive = false; }
     }
     if (KEY_STATUS.space && this.counter >= this.fireRate) {
         this.fire();
@@ -315,44 +333,11 @@ Ship.prototype.fire = function() {
     laserPool.get();
 };
 
-/*
-// Enemies our player must avoid
-var Enemy = function(x, y, speed) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.x = x;
-    this.y = y;
-    this.speed = speed;
-    this.sprite = 'images/enemy-bug.png';
-};
-
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-    this.x = this.x + this.speed * dt;
-    if (this.x > 500) {
-        // Initial enemy x-axis position
-        this.x = -60;
-        this.speed = Math.floor(Math.random() * 5 + 1) * 75;
-    }
-};
-
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};*/
-
-// Enemy object.
+// Enemy object
 var Enemy = function(enemyContext) {
     var spriteString = 'images/enemy.png';
 
-    Drawable.call(this, 0, 0, enemyContext, spriteString, 0, "bullet", "enemy");
+    Drawable.call(this, 0, 0, enemyContext, spriteString, 0, 'bullet', 'enemy');
 
     this.chance = 0;
     this.alive = false;
@@ -360,6 +345,7 @@ var Enemy = function(enemyContext) {
 };
 
 Enemy.prototype = Object.create(Drawable.prototype);
+
 Enemy.prototype.constructor = Enemy;
 
 // Enemy values
@@ -381,7 +367,7 @@ Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
     this.rightEdge = this.x + (this.width / 2) + 80;
 
     this.startBottomEdge = this.y + 170;
-    this.endBottomEdge = this.y + 300
+    this.endBottomEdge = this.y + 300;
 
     this.verticalMoving = true;
 
@@ -390,7 +376,7 @@ Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
     this.lifes = lifes;
     this.percentFire = fireRate;
 
-    if (type === "big") {
+    if (type === 'big') {
         var sprite = bossEnemySprites.pop();
         this.sprite = Resources.get('images/' + sprite + '.png');
         bossEnemySprites.unshift(sprite);
@@ -401,6 +387,7 @@ Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
         var margin = this.canvasWidth * 0.06;
         var minX = margin;
         var maxX = this.canvasWidth - margin;
+
         this.x = Math.floor(Math.random() * (maxX - minX + 1) + minX);
         this.type = 'big';
         this.leftEdge = 15 + (this.width / 2);
@@ -414,10 +401,11 @@ Enemy.prototype.draw = function(dt) {
     this.x += this.speedX * dt;
 
     // Move vertically
-    if (this.y <= this.endBottomEdge) this.y += this.speedY * dt;
+    if (this.y <= this.endBottomEdge) { this.y += this.speedY * dt; }
 
-    if (this.x + (this.width / 2) <= this.leftEdge) this.speedX = this.speed;
-    else if (this.x + (this.width / 2) >= this.rightEdge) {
+    if (this.x + (this.width / 2) <= this.leftEdge) {
+        this.speedX = this.speed;
+    } else if (this.x + (this.width / 2) >= this.rightEdge) {
         this.speedX = -this.speed;
     }
 
@@ -435,7 +423,7 @@ Enemy.prototype.draw = function(dt) {
     } else {
         if (this.isColliding && this.type === 'big') {
             this.lifes -= 1;
-            this.isColliding = false
+            this.isColliding = false;
         }
         this.context.drawImage(this.sprite, this.x, this.y);
         // Enemy has a chance to shoot every movement
@@ -447,31 +435,14 @@ Enemy.prototype.draw = function(dt) {
     }
 };
 
-/*
- * Fires a bullet
- */
-// Enemy.prototype.drawExplosion = function(dt) {
-//     var explosionSprites = ['images/explosion1.png', 'images/explosion2.png', 'images/explosion3.png']
-//     var test;
-//     for (var i in explosionSprites) {
-//         test = 1;
-//         while(test < 20) {
-//             console.log("here " + explosionSprites[i])
-//             this.context.drawImage(Resources.get(explosionSprites[i]), this.x, this.y);
-//             test += 1 * dt;
-//         }
-//         this.context.clearRect(this.x, this.y, Resources.get(explosionSprites[i]).width, Resources.get(explosionSprites[i]).height);
-
-//     }
-//     this.context.clearRect(this.x, this.y, Resources.get(explosionSprites[i]).width, Resources.get(explosionSprites[i]).height);
-
-// }
-
 // Fires bullets
 Enemy.prototype.fire = function() {
-    if (this.type === 'big') enemyBulletPool.getTwo((this.x + this.width / 2) + 6, this.y + this.height, -155, (this.x + this.width / 2) + 33, this.y + this.height, -155);
-    else enemyBulletPool.get(this.x + this.width / 2, this.y + this.height, -155);
-}
+    if (this.type === 'big') {
+        enemyBulletPool.getTwo((this.x + this.width / 2) + 6, this.y + this.height, -155, (this.x + this.width / 2) + 33, this.y + this.height, -155);
+    } else {
+        enemyBulletPool.get(this.x + this.width / 2, this.y + this.height, -155);
+    }
+};
 
 
 // Resets the enemy values
@@ -486,19 +457,10 @@ Enemy.prototype.clear = function() {
     this.alive = false;
     this.isColliding = false;
     this.lifes = 0;
-    this.percentFire = .01;
+    this.percentFire = 0.01;
 };
 
-/**
- * QuadTree object.
- *
- * The quadrant indexes are numbered as below:
- *     |
- *  1  |  0
- * —-+—-
- *  2  |  3
- *     |
- */
+// QuadTree - collision detection algorithm
 var QuadTree = function(boundBox, lvl) {
     this.maxObjects = 10;
     this.bounds = boundBox || {
@@ -511,11 +473,9 @@ var QuadTree = function(boundBox, lvl) {
     this.nodes = [];
     this.level = lvl || 0;
     this.maxLevels = 5;
-}
+};
 
-/*
- * Clears the quadTree and all nodes of objects
- */
+// Clears the quadTree and all nodes of objects
 QuadTree.prototype.clear = function() {
     this.objects = [];
     for (var i = 0; i < this.nodes.length; i++) {
@@ -524,12 +484,10 @@ QuadTree.prototype.clear = function() {
     this.nodes = [];
 };
 
-/*
- * Get all objects in the quadTree
- */
+// Get all objects in the quadTree
 QuadTree.prototype.getAllObjects = function(returnedObjects) {
-    for (var i = 0; i < this.nodes.length; i++) {
-        this.nodes[i].getAllObjects(returnedObjects);
+    for (var k = 0; k < this.nodes.length; k++) {
+        this.nodes[k].getAllObjects(returnedObjects);
     }
     for (var i = 0, len = this.objects.length; i < len; i++) {
         returnedObjects.push(this.objects[i]);
@@ -537,12 +495,10 @@ QuadTree.prototype.getAllObjects = function(returnedObjects) {
     return returnedObjects;
 };
 
-/*
- * Return all objects that the object could collide with
- */
+// Return all objects that the object could collide with
 QuadTree.prototype.findObjects = function(returnedObjects, obj) {
-    if (typeof obj === "undefined") {
-        console.log("UNDEFINED OBJECT");
+    if (typeof obj === 'undefined') {
+        console.log('UNDEFINED OBJECT');
         return;
     }
     var index = this.getIndex(obj);
@@ -554,13 +510,15 @@ QuadTree.prototype.findObjects = function(returnedObjects, obj) {
     }
     return returnedObjects;
 };
+
 /*
  * Insert the object into the quadTree. If the tree
  * excedes the capacity, it will split and add all
  * objects to their corresponding nodes.
  */
 QuadTree.prototype.insert = function(obj) {
-    if (typeof obj === "undefined") {
+    var index;
+    if (typeof obj === 'undefined') {
         return;
     }
     if (obj instanceof Array) {
@@ -570,7 +528,7 @@ QuadTree.prototype.insert = function(obj) {
         return;
     }
     if (this.nodes.length) {
-        var index = this.getIndex(obj);
+        index = this.getIndex(obj);
         // Only add the object to a subnode if it can fit completely
         // within one
         if (index != -1) {
@@ -584,13 +542,13 @@ QuadTree.prototype.insert = function(obj) {
         if (this.nodes[0] == null) {
             this.split();
         }
-        var i = 0;
-        while (i < this.objects.length) {
-            var index = this.getIndex(this.objects[i]);
+        var k = 0;
+        while (k < this.objects.length) {
+            index = this.getIndex(this.objects[k]);
             if (index != -1) {
-                this.nodes[index].insert((this.objects.splice(i, 1))[0]);
+                this.nodes[index].insert((this.objects.splice(k, 1))[0]);
             } else {
-                i++;
+                k++;
             }
         }
     }
@@ -624,9 +582,8 @@ QuadTree.prototype.getIndex = function(obj) {
     }
     return index;
 };
-/*
- * Splits the node into 4 subnodes
- */
+
+//Splits the node into 4 subnodes
 QuadTree.prototype.split = function() {
     // Bitwise or [html5rocks]
     var subWidth = (this.bounds.width / 2) | 0;
@@ -657,82 +614,24 @@ QuadTree.prototype.split = function() {
     }, this.level + 1);
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-
-// Player
-var Player = function() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-
-    // The image/sprite for our player, this uses
-    // a helper we've provided to easily load images
-    this.x = 2 * 101;
-    this.y = 5 * 83;
-    this.sprite = 'images/char-princess-girl.png';
-};
-
-// Update the player's position, required method for game
-// Parameter: dt, a time delta between ticks
-Player.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-};
-
-// Draw the player on the screen, required method for game
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
-// Handle keybord input in order to move player
-Player.prototype.handleInput = function() {
-    //code to be added
-};
-
-
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// var allEnemies = [];
-// for (var i = 0; i < 3; i++) {
-//     var tempSpeed = Math.floor(Math.random() * 5 + 1) * 75;
-//     allEnemies.push(new Enemy(-60, 60 + 85 * i, tempSpeed));
-// }
-// Place the player object in a variable called player
-// var player = new Player();
-
-
-
-// This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
-// document.addEventListener('keyup', function(e) {
-//     var allowedKeys = {
-//         37: 'left',
-//         38: 'up',
-//         39: 'right',
-//         40: 'down'
-//     };
-
-//     // player.handleInput(allowedKeys[e.keyCode]);
-// });
-
 // The keycodes that will be mapped when a user presses a button.
 // Original code by Doug McInnes
 KEY_CODES = {
-        32: 'space',
-        37: 'left',
-        38: 'up',
-        39: 'right',
-        40: 'down',
-    }
-    // Creates the array to hold the KEY_CODES and sets all their values
-    // to false. Checking true/flase is the quickest way to check status
-    // of a key press and which one was pressed when determining
-    // when to move and which direction.
+    32: 'space',
+    37: 'left',
+    38: 'up',
+    39: 'right',
+    40: 'down'
+};
+// Creates the array to hold the KEY_CODES and sets all their values
+// to false. Checking true/flase is the quickest way to check status
+// of a key press and which one was pressed when determining
+// when to move and which direction.
 KEY_STATUS = {};
-for (code in KEY_CODES) {
-    KEY_STATUS[KEY_CODES[code]] = false;
+for (var code in KEY_CODES) {
+    if (KEY_CODES.hasOwnProperty(code)) {
+        KEY_STATUS[KEY_CODES[code]] = false;
+    }
 }
 /**
  * Sets up the document to listen to onkeydown events (fired when
@@ -741,25 +640,25 @@ for (code in KEY_CODES) {
  * key it was.
  */
 document.onkeydown = function(e) {
-        timeIdle = 0;
-        // Firefox and opera use charCode instead of keyCode to
-        // return which key was pressed.
-        var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
-        if (KEY_CODES[keyCode]) {
-            e.preventDefault();
-            KEY_STATUS[KEY_CODES[keyCode]] = true;
-        }
+    timeIdle = 0;
+    // Firefox and opera use charCode instead of keyCode to
+    // return which key was pressed.
+    var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
+    if (KEY_CODES[keyCode]) {
+        e.preventDefault();
+        KEY_STATUS[KEY_CODES[keyCode]] = true;
     }
-    /**
-     * Sets up the document to listen to ownkeyup events (fired when
-     * any key on the keyboard is released). When a key is released,
-     * it sets teh appropriate direction to false to let us know which
-     * key it was.
-     */
+};
+/**
+ * Sets up the document to listen to ownkeyup events (fired when
+ * any key on the keyboard is released). When a key is released,
+ * it sets teh appropriate direction to false to let us know which
+ * key it was.
+ */
 document.onkeyup = function(e) {
     var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
     if (KEY_CODES[keyCode]) {
         e.preventDefault();
         KEY_STATUS[KEY_CODES[keyCode]] = false;
     }
-}
+};

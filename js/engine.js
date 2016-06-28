@@ -14,8 +14,6 @@
  * a little simpler to work with. 495 530
  */
 
-var laserPool, backgroundAudio, gameOverAudio, checkAudio, ship;
-
 var Engine = (function(global) {
 
     /* Predefine the variables we'll be using within this scope,
@@ -24,9 +22,11 @@ var Engine = (function(global) {
      */
     var doc = global.document,
         win = global.window,
+        ship,
         background,
         parallBackground,
         enemyPool,
+        enemyBulletPool,
         lifes,
         score,
         prize,
@@ -35,6 +35,7 @@ var Engine = (function(global) {
         levelIterations = 3,
         level,
         explosionPool,
+        laserPool,
         quadTree,
         ctxs = {},
         lifeImages = [],
@@ -92,6 +93,7 @@ var Engine = (function(global) {
     function init() {
         // Audio files
         laserPool = new SoundPool(10, "laser");
+        global.laserPool = laserPool;
         explosionPool = new SoundPool(20, "explosion4");
         deadPool = new SoundPool(2, "dead");
 
@@ -213,6 +215,8 @@ var Engine = (function(global) {
                 ctxs.spaceship.clearRect(0, 0, canvasWidth, canvasHeight);
                 ctxs.main.clearRect(0, 0, canvasWidth, canvasHeight);
                 enemyBulletPool = new Pool(50, ctxs.main, "enemyBullet");
+                global.enemyBulletPool = enemyBulletPool;
+
                 ship = new Ship(canvasWidth / 2, canvasHeight / 4 * 3, ctxs.spaceship, ctxs.main);
                 ship.draw();
             } else {
@@ -436,6 +440,7 @@ var Engine = (function(global) {
         // Initialize the enemy pool object
         enemyPool = new Pool(24, ctxs.main, "enemy");
         enemyBulletPool = new Pool(50, ctxs.main, "enemyBullet");
+        global.enemyBulletPool = enemyBulletPool;
 
 
         spawnPrizeOrLife();
@@ -460,11 +465,11 @@ var Engine = (function(global) {
         'images/enemyBullet.png',
         'images/ship.png',
         'images/enemy.png',
-        'images/enemy6.png',
-        'images/enemy7.png',
         'images/bossEnemy1.png',
         'images/bossEnemy2.png',
-        'images/bossEnemy3.png'
+        'images/bossEnemy3.png',
+        'images/spaceman.png',
+        'images/life.png'
     ]);
     Resources.onReady(init);
 
