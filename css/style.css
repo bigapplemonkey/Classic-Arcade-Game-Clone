@@ -1,3 +1,5 @@
+/* Element selectors */
+
 * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -8,9 +10,8 @@
 body {
     text-align: center;
     font-family: 'Press Start 2P', cursive;
-    color: #FF7F00;
+    color: #ff7f00;
     font-size: 13px;
-    /*background: #3499d6;*/
     background: rgba(52, 153, 214, 0.58);
     padding-top: 10px;
     margin-bottom: 0;
@@ -18,8 +19,8 @@ body {
 
 canvas {
     position: absolute;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     background: transparent;
 }
 
@@ -35,12 +36,43 @@ button {
     overflow: hidden;
     outline: none;
     font-family: inherit;
-    color: #FF7F00;
+    color: #ff7f00;
     font-size: 17px;
     border-style: dotted;
-    /*border-radius: 10%;*/
     padding: 10px;
 }
+
+ol {
+    width: 80%;
+    font-size: 14px;
+    text-align: justify;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+
+/* Canvas selectors */
+
+.background {
+    z-index: -3;
+}
+
+.parallBackground {
+    z-index: -4;
+}
+
+.prize {
+    z-index: -2;
+}
+
+.main {
+    z-index: -1;
+}
+
+
+/* Game screen selectors */
 
 .screen-container {
     margin: 0 auto;
@@ -50,17 +82,12 @@ button {
     z-index: 2;
 }
 
-.game-container {
-    position: relative;
-    z-index: 25;
-}
-
 .screen-border {
     background: gray;
     padding: 15px 30px;
-    -moz-box-shadow: inset 0 0 10px #000000;
-    -webkit-box-shadow: inset 0 0 10px #000000;
-    box-shadow: inset 0 0 10px #000000;
+    -moz-box-shadow: inset 0 0 10px #000;
+    -webkit-box-shadow: inset 0 0 10px #000;
+    box-shadow: inset 0 0 10px #000;
 }
 
 .full-screen {
@@ -69,7 +96,36 @@ button {
     padding: 40px 30px;
     height: 100%;
     border-radius: 30px 30px 0 0;
-    /*display: inline;*/
+}
+
+.game-container {
+    position: relative;
+    z-index: 25;
+}
+
+.lifes {
+    position: absolute;
+    top: 9px;
+    left: 20px;
+}
+
+.dead {
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+}
+
+.score {
+    position: absolute;
+    top: 9px;
+    left: 400px;
+    cursor: default;
+}
+
+.level {
+    position: absolute;
+    top: 9px;
+    left: 590px;
+    cursor: default;
 }
 
 .progress-screen {
@@ -86,6 +142,42 @@ button {
     margin-top: 20px;
     width: 100%;
 }
+
+.screen-text {
+    width: 720px;
+    height: 432px;
+    font-size: 30px;
+    cursor: default;
+    z-index: 8;
+}
+
+.game-container div.screen-text {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.game-over-title {
+    margin-top: 180px;
+    text-align: center;
+}
+
+.loading {
+    margin-top: 130px;
+}
+
+.progress-screen button {
+    margin-top: 10px;
+    color: #545454;
+}
+
+.instructions {
+    display: none;
+}
+
+
+/* External screen layout selectors */
 
 .game-controls {
     position: relative;
@@ -148,8 +240,6 @@ button {
 }
 
 .button-text2 {
-    /*bottom: 35px;
-    left: 70px;*/
     top: 10px;
     font-size: 20px;
 }
@@ -171,6 +261,9 @@ button {
     width: 27%;
 }
 
+
+/* General classes */
+
 .center {
     margin: 0 auto;
 }
@@ -178,105 +271,3 @@ button {
 .pull-left {
     float: left;
 }
-
-.dead {
-    -webkit-filter: grayscale(100%);
-    /* Chrome, Safari, Opera */
-    filter: grayscale(100%);
-}
-
-#background {
-    z-index: -3;
-}
-
-#parallBackground {
-    z-index: -4;
-}
-
-#prize {
-    z-index: -2;
-}
-
-#main {
-    z-index: -1;
-}
-
-#ship {
-    z-index: 0;
-}
-
-.score {
-    position: absolute;
-    top: 9px;
-    left: 400px;
-    cursor: default;
-}
-
-.level {
-    position: absolute;
-    top: 9px;
-    left: 590px;
-    cursor: default;
-}
-
-.lifes {
-    position: absolute;
-    top: 9px;
-    left: 20px;
-}
-
-.game-over {
-    width: 720px;
-    height: 432px;
-    font-size: 30px;
-    cursor: default;
-    z-index: 8;
-}
-
-#game-over {
-    display: none;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-}
-
-.game-over h4 {
-    margin-top: 180px;
-    text-align: center;
-}
-
-.game-over span {
-    font-size: 20px;
-    cursor: pointer;
-    position: relative;
-    left: 50px;
-}
-
-.game-over span:hover {
-    color: #FFD700;
-}
-
-.loading {
-    margin-top: 130px;
-}
-
-.progress-screen button {
-    margin-top: 10px;
-    color: #545454;
-}
-
-ol {
-    width: 80%;
-    font-size: 14px;
-    text-align: justify;
-}
-
-li {
-    margin-bottom: 10px;
-}
-
-#instructions {
-    display: none;
-}
-
-

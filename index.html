@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Effective JavaScript: Galaxian</title>
-    <link href='https://fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <script src="https://use.fontawesome.com/957adda781.js"></script>
 </head>
@@ -12,19 +12,19 @@
 <body>
     <div class="full-screen center">
         <div class="screen-border center">
-            <div class="screen-container center" id="screen-container">
+            <div id="screen-container" class="screen-container center">
                 <div id="progress-screen" class="progress-screen">
                     <div id="loading" class="loading">
                         <i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
                         <div class="loading-text">Loading...</div>
                     </div>
-                    <div class="game-over" id="instructions">
+                    <div id="instructions" class="screen-text instructions" >
                         <h3>**** GALAXIAN ****</h3>
                         <ol class="center">
                             <li>Defeat the outer space enemy by firing your laser misiles with your space key</li>
                             <li>Dodge the enemy's misiles by using your arrow keys to move</li>
                             <li>Rescue your fellow space men and collect extra lifes when in need</li>
-                            <li>Have fun while keeping our galaxy safe from evil!</li>
+                            <li>Have fun while keeping the galaxy safe from evil!</li>
                         </ol>
                         <button id="start">Start</button>
                     </div>
@@ -37,8 +37,8 @@
                     </div>
                     <div class="score">SCORE: <span id="score"></span></div>
                     <div class="level">LEVEL: <span id="level"></span></div>
-                    <div class="game-over" id="game-over">
-                        <h4>GAME OVER</h4>
+                    <div class="screen-text" id="game-over">
+                        <h4 class="game-over-title">GAME OVER</h4>
                         <button id="restart">Restart</button>
                     </div>
                 </div>

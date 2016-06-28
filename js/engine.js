@@ -40,7 +40,8 @@ var Engine = (function(global) {
         levelIterations = 3,
         level,
         lastTime,
-        level1InitialConfig,
+        level1Config,
+        // TODO: implement difficulty selection
         difficultyLevels = { easy: 0.02, medium: 0.3, difficult: 0.45 };
 
     // For collision detection
@@ -51,7 +52,8 @@ var Engine = (function(global) {
         explosionPool,
         laserPool,
         variousSounds = { prizeSound: 0.3, gameOverSound: 0.3, levelUp: 0.6 },
-        variousSoundsPool = {};
+        variousSoundsPool = {},
+        checkAudio;
 
     // For visual manipulation
     var ctxs = {},
@@ -80,7 +82,6 @@ var Engine = (function(global) {
          * our update function since it may be used for smooth animation.
          */
         update(dt);
-        // render();
 
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
@@ -92,7 +93,9 @@ var Engine = (function(global) {
             return;
         }
 
-        if (lifes < 1) return;
+        if (lifes < 1) {
+            return;
+        }
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
@@ -128,6 +131,7 @@ var Engine = (function(global) {
                 canvas.id = canvasIDs[i];
                 canvas.width = canvasWidth;
                 canvas.height = canvasHeight;
+                canvas.className = canvasIDs[i];
                 canvas.innerHTML = i === 0 ? 'Your browser does not support canvas. Please try again with a different browser.' : '';
                 gameContainer.appendChild(canvas);
             }
@@ -142,27 +146,23 @@ var Engine = (function(global) {
 
     }
 
+    // Checks when audio ready so the game can be started.
+    // Removes loading screen an display instructions once resourses are loaded
     function checkReadyState() {
         var isAudioReady = true;
         for (var key in variousSoundsPool) {
-            if (variousSoundsPool[key].readyState !== 4) isAudioReady = false;
+            if (variousSoundsPool[key].readyState !== 4) {
+                isAudioReady = false;
+            }
         }
 
-        if (isAudioReady) { //gameOverAudio.readyState === 4 &&
+        if (isAudioReady) {
             win.clearInterval(checkAudio);
             reset();
-            lastTime = Date.now();
             doc.getElementById('loading').style.display = 'none';
             doc.getElementById('instructions').style.display = 'block';
-            // main();
         }
     }
-
-    function gameOver() {
-        variousSoundsPool.gameOverSound.play();
-        doc.getElementById('game-over').style.display = 'block';
-    }
-
 
 
     /* This function is called by main (our game loop) and itself calls all
@@ -187,25 +187,32 @@ var Engine = (function(global) {
         updateEntities(dt);
     }
 
+    // Start of collision detection algorithm
+    // by inseting objects into quadtree
     function checkCollisions(dt) {
-        // Insert objects into quadtree
         quadTree.clear();
         quadTree.insert(ship);
         quadTree.insert(ship.bulletPool.getPool());
         quadTree.insert(enemyPool.getPool());
         quadTree.insert(prize);
         quadTree.insert(enemyBulletPool.getPool());
+
         detectCollision(dt);
     }
 
+    // Detects the collisiong of surrounding objects
+    // in the quadtree and handles collisions after
     function detectCollision(dt) {
         var objects = [];
         var collidingObjects = [];
-        quadTree.getAllObjects(objects);
-        for (var x = 0, len = objects.length; x < len; x++) {
-            quadTree.findObjects(obj = [], objects[x]);
 
-            for (y = 0, length = obj.length; y < length; y++) {
+        quadTree.getAllObjects(objects);
+
+        for (var x = 0, len = objects.length; x < len; x++) {
+            var obj = [];
+            quadTree.findObjects(obj, objects[x]);
+
+            for (var y = 0, length = obj.length; y < length; y++) {
 
                 // DETECT COLLISION ALGORITHM
                 if (objects[x].collidableWith === obj[y].type &&
@@ -222,35 +229,40 @@ var Engine = (function(global) {
             }
         }
 
-        // Handle updates if any onject collision
+        // Handles updates if any object collision
         if (collidingObjects.indexOf('enemyBullet') > -1) {
             lifeImages[lifes - 1].className += ' dead';
             lifes -= 1;
             if (lifes > 0) {
                 deadPool.get();
 
-                // Clear enemy bullets and redraw ship
+                // Clears enemy bullets
                 ctxs.spaceship.clearRect(0, 0, canvasWidth, canvasHeight);
                 ctxs.main.clearRect(0, 0, canvasWidth, canvasHeight);
                 enemyBulletPool = new Pool(50, ctxs.main, 'enemyBullet');
                 global.enemyBulletPool = enemyBulletPool;
 
+                // Redraw ship
                 ship = new Ship(canvasWidth / 2, canvasHeight / 4 * 3, ctxs.spaceship, ctxs.main);
                 ship.draw();
             } else {
                 gameOver();
             }
-        } else if (collidingObjects.indexOf('bullet') > -1) {
+        }
+
+        if (collidingObjects.indexOf('bullet') > -1) {
             score += 100;
             explosionPool.get();
         }
 
         if (collidingObjects.indexOf('prize') > -1) {
-            if (!prize.extraLife) score += 500;
-            else {
+            if (prize.extraLife) {
                 lifeImages[lifes].className = '';
                 lifes += 1;
+            } else {
+                score += 500;
             }
+
             variousSoundsPool.prizeSound.play();
             spawnPrizeOrLife(dt);
             ship.isColliding = false;
@@ -275,10 +287,13 @@ var Engine = (function(global) {
         spawnPrizeOrLife(dt);
     }
 
-    // Spawn a new wave of enemies
+    // Spawns a new wave of enemies or a boss enemy according to game iteration,
+    // Increases level according to game iteration - levelUp()
     function spawnWave() {
         gameIteration += 1;
-        if ((gameIteration - 1) % levelIterations === 0) levelUp();
+        if ((gameIteration - 1) % levelIterations === 0) {
+            levelUp();
+        }
 
         var height = enemyPool.pool[0].height;
         var width = enemyPool.pool[0].width;
@@ -302,6 +317,8 @@ var Engine = (function(global) {
         }
     }
 
+    // Handles updates when level increases
+    // Adds difficulty based on the level
     function levelUp() {
         ++level;
         if (level > 1) {
@@ -316,13 +333,17 @@ var Engine = (function(global) {
         }
     }
 
-    // Spawn a new wave of enemies
+    // Spawns a new prize or life according to some
+    // operations with random numbers
     function spawnPrizeOrLife(dt) {
         var speed = level1Config.prizeSpeed;
         if (gameIteration > 0) {
             if (prize.draw(dt)) {
-                if (prize.isColliding) prize.y = 900;
-                var chance = (Math.floor(Math.random() * 1600));
+                // Put prize off canvas if taken
+                prize.y = prize.isColliding ? 900 : prize.y;
+
+                var chance = Math.floor(Math.random() * 1600);
+
                 if (chance <= 1 && lifes < 3) {
                     prize = new Prize(0, 0, ctxs.prize, true);
                     prize.spawn(speed);
@@ -337,13 +358,15 @@ var Engine = (function(global) {
         }
     }
 
-    doc.getElementById('restart').onclick = function() {
-        doc.getElementById('game-over').style.display = 'none';
-        reset();
-        lastTime = Date.now();
-        main();
-    };
 
+    // Handles game-over updates
+    function gameOver() {
+        variousSoundsPool.gameOverSound.play();
+        doc.getElementById('game-over').style.display = 'block';
+    }
+
+
+    // Adds event listener for start button
     doc.getElementById('start').onclick = function() {
         doc.getElementById('progress-screen').style.display = 'none';
         reset();
@@ -351,62 +374,13 @@ var Engine = (function(global) {
         main();
     };
 
-    /* This function initially draws the "game level", it will then call
-     * the renderEntities function. Remember, this function is called every
-     * game tick (or loop of the game engine) because that's how games work -
-     * they are flipbooks creating the illusion of animation but in reality
-     * they are just drawing the entire screen over and over.
-     */
-    function render() {
-        /* This array holds the relative URL to the image used
-         * for that particular row of the game level.
-         */
-        var rowImages = [
-                'images/water-block.png', // Top row is water
-                'images/stone-block.png', // Row 1 of 3 of stone
-                'images/stone-block.png', // Row 2 of 3 of stone
-                'images/stone-block.png', // Row 3 of 3 of stone
-                'images/grass-block.png', // Row 1 of 2 of grass
-                'images/grass-block.png' // Row 2 of 2 of grassl
-            ],
-            numRows = 6,
-            numCols = 5,
-            row, col;
-
-        /* Loop through the number of rows and columns we've defined above
-         * and, using the rowImages array, draw the correct image for that
-         * portion of the "grid"
-         */
-        for (row = 0; row < numRows; row++) {
-            for (col = 0; col < numCols; col++) {
-                /* The drawImage function of the canvas' context element
-                 * requires 3 parameters: the image to draw, the x coordinate
-                 * to start drawing and the y coordinate to start drawing.
-                 * We're using our Resources helpers to refer to our images
-                 * so that we get the benefits of caching these images, since
-                 * we're using them over and over.
-                 */
-                ctxs.background.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
-            }
-        }
-
-        renderEntities();
-    }
-
-    /* This function is called by the render function and is called on each game
-     * tick. Its purpose is to then call the render functions you have defined
-     * on your enemy and player entities within app.js
-     */
-    function renderEntities() {
-        /* Loop through all of the objects within the allEnemies array and call
-         * the render function you have defined.
-         */
-        allEnemies.forEach(function(enemy) {
-            enemy.render();
-        });
-
-        player.render();
-    }
+    // Adds event listener for restart button
+    doc.getElementById('restart').onclick = function() {
+        doc.getElementById('game-over').style.display = 'none';
+        reset();
+        lastTime = Date.now();
+        main();
+    };
 
     /**
      * requestAnim shim layer by Paul Irish
@@ -418,7 +392,7 @@ var Engine = (function(global) {
             win.webkitRequestAnimationFrame ||
             win.mozRequestAnimationFrame ||
             win.oRequestAnimationFrame ||
-            wind.msRequestAnimationFrame ||
+            win.msRequestAnimationFrame ||
             function( /* function */ callback, /* DOMElement */ element) {
                 win.setTimeout(callback, 1000 / 60);
             };
@@ -429,7 +403,6 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
         score = 0;
         lifes = 3;
         gameIteration = 0;
@@ -442,22 +415,22 @@ var Engine = (function(global) {
             prizeSpeed: 70
         };
 
-        background = new Background(0, 0, ctxs.background);
-        parallBackground = new Background(0, 0, ctxs.parallBackground, true);
-
+        // Clears canvas
         for (var i in canvasIDs) {
             if (canvasIDs.hasOwnProperty(i)) {
                 ctxs[canvasIDs[i]].clearRect(0, 0, canvasWidth, canvasHeight);
             }
         }
 
+        // Resets life images' classes
         for (var j = 0; j < 3; j++) {
             lifeImages[j].className = '';
         }
 
+        // Intializes game objects
+        background = new Background(0, 0, ctxs.background);
+        parallBackground = new Background(0, 0, ctxs.parallBackground, true);
         ship = new Ship(canvasWidth / 2, canvasHeight / 4 * 3, ctxs.spaceship, ctxs.main);
-
-        // Initialize the enemy pool object
         enemyPool = new Pool(24, ctxs.main, 'enemy');
         enemyBulletPool = new Pool(50, ctxs.main, 'enemyBullet');
         global.enemyBulletPool = enemyBulletPool;
@@ -465,10 +438,8 @@ var Engine = (function(global) {
 
         spawnPrizeOrLife();
 
-        // Start QuadTree
+        // Starts QuadTree
         quadTree = new QuadTree({ x: 0, y: 0, width: canvasWidth, height: canvasHeight });
-
-        // backgroundAudio.currentTime = 0;
 
         ship.draw();
         timeIdle = 0;
@@ -492,12 +463,5 @@ var Engine = (function(global) {
         'images/life.png'
     ]);
     Resources.onReady(init);
-
-    /* Assign the canvas' context object to the global variable (the window
-     * object when run in a browser) so that developers can use it more easily
-     * from within their app.js files.
-     */
-    global.ctx = ctxs.background;
-    // global.background = background;
 
 })(this);

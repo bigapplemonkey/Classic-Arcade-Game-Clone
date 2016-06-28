@@ -4,7 +4,7 @@
 var bossEnemySprites = ['bossEnemy1', 'bossEnemy2', 'bossEnemy3'];
 var timeIdle = 0;
 
-// Add time if game is idle
+// Adds time if game is idle
 setInterval(function() { timeIdle += 2; }, 2000);
 
 // Drawable object, all moving objects inherit from this Drawable
@@ -33,12 +33,12 @@ var Drawable = function(x, y, context, spriteString, speed, collidableWith, type
     this.isColliding = false;
 };
 
-// Define abstract functions to be implemented in child objects
+// Defines abstract functions to be implemented in child objects
 Drawable.prototype.draw = function() {};
 
 Drawable.prototype.move = function() {};
 
-
+// Returns true if instance is collidable with object
 Drawable.prototype.isCollidableWith = function(object) {
     return (this.isCollidableWith === object.type);
 };
@@ -62,16 +62,16 @@ Background.prototype = Object.create(Drawable.prototype);
 
 Background.prototype.constructor = Background;
 
-// Implement abstract function
+// Draws backgound continuosly to create scrolling effect
 Background.prototype.draw = function(dt) {
     this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     this.y += this.speed * dt;
 
-    // Draw background image one on top of the other for continuity
+    // Draws background image one on top of the other for continuity
     this.context.drawImage(this.sprite, this.x, this.y);
     this.context.drawImage(this.sprite, this.x, this.y - this.height + 2);
 
-    // Draw parallel background image one on top of the other for continuity
+    // Draws parallel background image one on top of the other for continuity
     if (!this.parallel) {
         this.context.drawImage(this.sprite, this.width - 2, this.y);
         this.context.drawImage(this.sprite, this.width, this.y - this.height);
@@ -161,7 +161,7 @@ Bullet.prototype = Object.create(Drawable.prototype);
 
 Bullet.prototype.constructor = Bullet;
 
-// Bullet values
+// Initalizes bullet values before beign drawn
 Bullet.prototype.spawn = function(x, y, speed) {
     this.x = x;
     this.y = y;
@@ -169,7 +169,7 @@ Bullet.prototype.spawn = function(x, y, speed) {
     this.alive = true;
 };
 
-// Returns true if the bullet moved off the screen so the the bullet is cleared by the pool
+// Returns true if the bullet moved off the screen or is colliding
 Bullet.prototype.draw = function(dt) {
     this.context.clearRect(this.x - 1, this.y - 1, this.width + 1, this.height + 1);
     this.y -= this.speed * dt;
@@ -211,6 +211,7 @@ Prize.prototype = Object.create(Drawable.prototype);
 
 Prize.prototype.constructor = Prize;
 
+// Initalize prize values before beign drawn
 Prize.prototype.spawn = function(speed) {
     var margin = this.canvasWidth * 0.06;
     var minX = margin;
@@ -221,6 +222,7 @@ Prize.prototype.spawn = function(speed) {
     this.speed = speed;
 };
 
+//Returns true if the bullet moved off the screen or is colliding
 Prize.prototype.draw = function(dt) {
     this.context.clearRect(this.x, this.y - 1, this.width, this.height + 1);
     this.y += this.speed * dt;
@@ -233,6 +235,7 @@ Prize.prototype.draw = function(dt) {
     }
 };
 
+// Resets the prize values
 Prize.prototype.clear = function() {
     this.x = 0;
     this.y = 0;
@@ -283,10 +286,13 @@ Ship.prototype = Object.create(Drawable.prototype);
 
 Ship.prototype.constructor = Ship;
 
+
+// Draws the ship
 Ship.prototype.draw = function() {
     this.context.drawImage(this.sprite, this.x, this.y);
 };
 
+// Detects if there is any move action or firing for the ship
 Ship.prototype.move = function(dt) {
     this.counter++;
     // Determine if the action is move action
@@ -348,7 +354,7 @@ Enemy.prototype = Object.create(Drawable.prototype);
 
 Enemy.prototype.constructor = Enemy;
 
-// Enemy values
+// Initilizes enemy values before being drawn
 Enemy.prototype.spawn = function(x, y, speed, type, fireRate, lifes) {
     this.sprite = Resources.get('images/enemy.png');
 
@@ -418,7 +424,6 @@ Enemy.prototype.draw = function(dt) {
     }
 
     if (this.isColliding && this.lifes === 0) {
-        // this.drawExplosion(dt);
         return true;
     } else {
         if (this.isColliding && this.type === 'big') {
@@ -484,7 +489,7 @@ QuadTree.prototype.clear = function() {
     this.nodes = [];
 };
 
-// Get all objects in the quadTree
+// Gets all objects in the quadTree
 QuadTree.prototype.getAllObjects = function(returnedObjects) {
     for (var k = 0; k < this.nodes.length; k++) {
         this.nodes[k].getAllObjects(returnedObjects);
@@ -495,7 +500,7 @@ QuadTree.prototype.getAllObjects = function(returnedObjects) {
     return returnedObjects;
 };
 
-// Return all objects that the object could collide with
+// Returns all objects that the object could collide with
 QuadTree.prototype.findObjects = function(returnedObjects, obj) {
     if (typeof obj === 'undefined') {
         console.log('UNDEFINED OBJECT');
@@ -512,7 +517,7 @@ QuadTree.prototype.findObjects = function(returnedObjects, obj) {
 };
 
 /*
- * Insert the object into the quadTree. If the tree
+ * Inserts the object into the quadTree. If the tree
  * excedes the capacity, it will split and add all
  * objects to their corresponding nodes.
  */
@@ -623,6 +628,7 @@ KEY_CODES = {
     39: 'right',
     40: 'down'
 };
+
 // Creates the array to hold the KEY_CODES and sets all their values
 // to false. Checking true/flase is the quickest way to check status
 // of a key press and which one was pressed when determining
@@ -633,6 +639,7 @@ for (var code in KEY_CODES) {
         KEY_STATUS[KEY_CODES[code]] = false;
     }
 }
+
 /**
  * Sets up the document to listen to onkeydown events (fired when
  * any key on the keyboard is pressed down). When a key is pressed,
