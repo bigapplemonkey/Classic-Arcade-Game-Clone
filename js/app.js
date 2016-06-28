@@ -252,7 +252,7 @@ var SoundPool = function(maxSize, object) {
     // Populates the pool array with the given sound
     for (var i = 0; i < this.size; i++) {
         var sound = new Audio(soundString);
-        sound.volume = 0.2;
+        sound.volume = 0.4;
         sound.load();
         this.pool[i] = sound;
     }

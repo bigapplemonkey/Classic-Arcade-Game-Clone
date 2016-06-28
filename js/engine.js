@@ -20,33 +20,47 @@ var Engine = (function(global) {
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
      */
+
+    // DOM manipulation variables
     var doc = global.document,
-        win = global.window,
-        ship,
-        background,
+        win = global.window;
+
+    // Game object instances
+    var background,
         parallBackground,
+        ship,
         enemyPool,
         enemyBulletPool,
-        lifes,
+        prize;
+
+    //Game general variables
+    var lifes,
         score,
-        prize,
-        deadPool,
         gameIteration,
         levelIterations = 3,
         level,
+        lastTime,
+        level1InitialConfig,
+        difficultyLevels = { easy: 0.02, medium: 0.3, difficult: 0.45 };
+
+    // For collision detection
+    var quadTree;
+
+    // Sound object instances and variables
+    var deadPool,
         explosionPool,
         laserPool,
-        quadTree,
-        ctxs = {},
+        variousSounds = { prizeSound: 0.3, gameOverSound: 0.3, levelUp: 0.6 },
+        variousSoundsPool = {};
+
+    // For visual manipulation
+    var ctxs = {},
         lifeImages = [],
-        level1InitialConfig,
         canvasIDs = ['parallBackground', 'background', 'prize', 'main', 'spaceship'],
-        variousSounds = { prizeSound: .3, gameOverSound: .3, levelUp: .6 },
-        difficultyLevels = { easy: 0.02, medium: 0.3, difficult: 0.45 },
-        variousSoundsPool = {},
         canvasWidth = 720,
-        canvasHeight = 432,
-        lastTime;
+        canvasHeight = 432;
+
+
 
 
     /* This function serves as the kickoff point for the game loop itself
@@ -74,7 +88,7 @@ var Engine = (function(global) {
         lastTime = now;
 
         if (timeIdle > 10) {
-            doc.getElementById('progress-screen').style.display = "block";
+            doc.getElementById('progress-screen').style.display = 'block';
             return;
         }
 
@@ -92,35 +106,39 @@ var Engine = (function(global) {
      */
     function init() {
         // Audio files
-        laserPool = new SoundPool(10, "laser");
+        laserPool = new SoundPool(10, 'laser');
         global.laserPool = laserPool;
-        explosionPool = new SoundPool(20, "explosion4");
-        deadPool = new SoundPool(2, "dead");
+        explosionPool = new SoundPool(20, 'explosion');
+        deadPool = new SoundPool(2, 'dead');
 
         for (var key in variousSounds) {
-            variousSoundsPool[key] = new Audio("sounds/" + key + ".mp3");
-            variousSoundsPool[key].volume = variousSounds[key];
-            variousSoundsPool[key].load();
+            if (variousSounds.hasOwnProperty(key)) {
+                variousSoundsPool[key] = new Audio('sounds/' + key + '.mp3');
+                variousSoundsPool[key].volume = variousSounds[key];
+                variousSoundsPool[key].load();
+            }
         }
 
         // Initializes the 5 canvas in canvasIDs
-        var gameContainer = doc.getElementById("game-container");
+        var gameContainer = doc.getElementById('game-container');
         for (var i in canvasIDs) {
-            var canvas = doc.createElement('canvas');
-            ctxs[canvasIDs[i]] = canvas.getContext('2d');
-            canvas.id = canvasIDs[i];
-            canvas.width = canvasWidth;
-            canvas.height = canvasHeight;
-            canvas.innerHTML = i == 0 ? 'Your browser does not support canvas. Please try again with a different browser.' : ''
-            gameContainer.appendChild(canvas);
+            if (canvasIDs.hasOwnProperty(i)) {
+                var canvas = doc.createElement('canvas');
+                ctxs[canvasIDs[i]] = canvas.getContext('2d');
+                canvas.id = canvasIDs[i];
+                canvas.width = canvasWidth;
+                canvas.height = canvasHeight;
+                canvas.innerHTML = i === 0 ? 'Your browser does not support canvas. Please try again with a different browser.' : '';
+                gameContainer.appendChild(canvas);
+            }
         }
 
         // Caches the life images
-        for (var i = 1; i < 4; i++) {
-            lifeImages.push(doc.getElementById("life" + i));
+        for (var k = 1; k < 4; k++) {
+            lifeImages.push(doc.getElementById('life' + k));
         }
 
-        checkAudio = window.setInterval(function() { checkReadyState() }, 1000);
+        checkAudio = win.setInterval(function() { checkReadyState(); }, 1000);
 
     }
 
@@ -131,18 +149,18 @@ var Engine = (function(global) {
         }
 
         if (isAudioReady) { //gameOverAudio.readyState === 4 &&
-            window.clearInterval(checkAudio);
+            win.clearInterval(checkAudio);
             reset();
             lastTime = Date.now();
-            doc.getElementById('loading').style.display = "none";
-            doc.getElementById('instructions').style.display = "block";
+            doc.getElementById('loading').style.display = 'none';
+            doc.getElementById('instructions').style.display = 'block';
             // main();
         }
     }
 
     function gameOver() {
         variousSoundsPool.gameOverSound.play();
-        doc.getElementById('game-over').style.display = "block";
+        doc.getElementById('game-over').style.display = 'block';
     }
 
 
@@ -205,8 +223,8 @@ var Engine = (function(global) {
         }
 
         // Handle updates if any onject collision
-        if (collidingObjects.indexOf("enemyBullet") > -1) {
-            lifeImages[lifes - 1].className += " dead";
+        if (collidingObjects.indexOf('enemyBullet') > -1) {
+            lifeImages[lifes - 1].className += ' dead';
             lifes -= 1;
             if (lifes > 0) {
                 deadPool.get();
@@ -214,7 +232,7 @@ var Engine = (function(global) {
                 // Clear enemy bullets and redraw ship
                 ctxs.spaceship.clearRect(0, 0, canvasWidth, canvasHeight);
                 ctxs.main.clearRect(0, 0, canvasWidth, canvasHeight);
-                enemyBulletPool = new Pool(50, ctxs.main, "enemyBullet");
+                enemyBulletPool = new Pool(50, ctxs.main, 'enemyBullet');
                 global.enemyBulletPool = enemyBulletPool;
 
                 ship = new Ship(canvasWidth / 2, canvasHeight / 4 * 3, ctxs.spaceship, ctxs.main);
@@ -222,15 +240,15 @@ var Engine = (function(global) {
             } else {
                 gameOver();
             }
-        } else if (collidingObjects.indexOf("bullet") > -1) {
+        } else if (collidingObjects.indexOf('bullet') > -1) {
             score += 100;
             explosionPool.get();
         }
 
-        if (collidingObjects.indexOf("prize") > -1) {
+        if (collidingObjects.indexOf('prize') > -1) {
             if (!prize.extraLife) score += 500;
             else {
-                lifeImages[lifes].className = "";
+                lifeImages[lifes].className = '';
                 lifes += 1;
             }
             variousSoundsPool.prizeSound.play();
@@ -259,7 +277,7 @@ var Engine = (function(global) {
 
     // Spawn a new wave of enemies
     function spawnWave() {
-        gameIteration += 1
+        gameIteration += 1;
         if ((gameIteration - 1) % levelIterations === 0) levelUp();
 
         var height = enemyPool.pool[0].height;
@@ -271,14 +289,14 @@ var Engine = (function(global) {
         var speed = level1Config.enemySpeed;
 
         if (gameIteration % levelIterations === 0) {
-            enemyPool.get(x, -100, speed, "big", level1Config.bigEnemyFireRate, level1Config.bigEnemyLifes);
+            enemyPool.get(x, -100, speed, 'big', level1Config.bigEnemyFireRate, level1Config.bigEnemyLifes);
         } else {
             for (var i = 1; i <= 24; i++) {
-                enemyPool.get(x, y, speed, "small", level1Config.smallEnemyFireRate, 0);
-               x += width + 30;
-                if (i % 8 == 0) {
+                enemyPool.get(x, y, speed, 'small', level1Config.smallEnemyFireRate, 0);
+                x += width + 30;
+                if (i % 8 === 0) {
                     x = 95;
-                    y += spacer
+                    y += spacer;
                 }
             }
         }
@@ -319,15 +337,15 @@ var Engine = (function(global) {
         }
     }
 
-    doc.getElementById("restart").onclick = function() {
-        doc.getElementById('game-over').style.display = "none";
+    doc.getElementById('restart').onclick = function() {
+        doc.getElementById('game-over').style.display = 'none';
         reset();
         lastTime = Date.now();
         main();
     };
 
-    doc.getElementById("start").onclick = function() {
-        doc.getElementById('progress-screen').style.display = "none";
+    doc.getElementById('start').onclick = function() {
+        doc.getElementById('progress-screen').style.display = 'none';
         reset();
         lastTime = Date.now();
         main();
@@ -396,13 +414,13 @@ var Engine = (function(global) {
      * otherwise defaults to setTimeout().
      */
     global.requestAnimFrame = (function() {
-        return window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame ||
-            window.oRequestAnimationFrame ||
-            window.msRequestAnimationFrame ||
+        return win.requestAnimationFrame ||
+            win.webkitRequestAnimationFrame ||
+            win.mozRequestAnimationFrame ||
+            win.oRequestAnimationFrame ||
+            wind.msRequestAnimationFrame ||
             function( /* function */ callback, /* DOMElement */ element) {
-                window.setTimeout(callback, 1000 / 60);
+                win.setTimeout(callback, 1000 / 60);
             };
     })();
 
@@ -428,18 +446,20 @@ var Engine = (function(global) {
         parallBackground = new Background(0, 0, ctxs.parallBackground, true);
 
         for (var i in canvasIDs) {
-            ctxs[canvasIDs[i]].clearRect(0, 0, canvasWidth, canvasHeight);
+            if (canvasIDs.hasOwnProperty(i)) {
+                ctxs[canvasIDs[i]].clearRect(0, 0, canvasWidth, canvasHeight);
+            }
         }
 
-        for (var i = 0; i < 3; i++) {
-            lifeImages[i].className = "";
+        for (var j = 0; j < 3; j++) {
+            lifeImages[j].className = '';
         }
 
         ship = new Ship(canvasWidth / 2, canvasHeight / 4 * 3, ctxs.spaceship, ctxs.main);
 
         // Initialize the enemy pool object
-        enemyPool = new Pool(24, ctxs.main, "enemy");
-        enemyBulletPool = new Pool(50, ctxs.main, "enemyBullet");
+        enemyPool = new Pool(24, ctxs.main, 'enemy');
+        enemyBulletPool = new Pool(50, ctxs.main, 'enemyBullet');
         global.enemyBulletPool = enemyBulletPool;
 
 
