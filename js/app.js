@@ -167,6 +167,8 @@ Bullet.prototype.draw = function(dt) {
         (this.self === 'enemyBullet' && this.y >= this.canvasHeight)) {
         return true;
     } else {
+        this.y = Math.round(this.y);
+        this.x = Math.round(this.x);
         this.context.drawImage(this.sprite, this.x, this.y);
         return false;
     }
@@ -206,7 +208,7 @@ Prize.prototype.spawn = function(speed) {
 };
 
 Prize.prototype.draw = function(dt) {
-    this.context.clearRect(this.x, this.y, this.width, this.height);
+    this.context.clearRect(this.x, this.y - 1, this.width, this.height + 1);
     this.y += this.speed * dt;
     if (this.isColliding || this.y >= this.canvasHeight) {
         return true;
