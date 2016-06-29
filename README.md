@@ -1,6 +1,20 @@
-frontend-nanodegree-arcade-game
-===============================
+# Frontend Nanodegree Project - Classic Arcade Game Clone
 
-Students should use this [rubric](https://www.udacity.com/course/viewer/#!/c-nd001/l-2696458597/m-2687128535) for self-checking their submission.
+Recreation of the classic arcade game Galaxian.
 
-For detailed instructions on how to get started, check out this [guide](https://docs.google.com/document/d/1v01aScPjSWCCWQLIpFqvg3-vXLH2e8_SZQKC8jNO0Dc/pub?embedded=true).
+This implementation uses Object-Oriented Javascript and HTML5 Canvas.
+
+## Feautures:
+- Levels - Difficulty increments as level progresses. Each level ends with a boss enemy.
+- Score - Each fired misile that hits the enemy adds 100 points to the score.
+- Extra-rewards - Each spaceman gathered adds 500 points to the score.
+- Extra-lives - Random spawned lives can be gathered to extend your game.
+- MP3 sounds.
+
+## Instructions:
+- Fire your laser misiles with your space key.
+- Dodge the enemy's misiles by moving with your arrow keys.
+- Gather space men for extra-poins or extra lifes to stay in the game.
+
+Have fun [here](https://bigapplemonkey.github.io/Classic-Arcade-Game-Clone/) and keep the galaxy safe from evil!
+
