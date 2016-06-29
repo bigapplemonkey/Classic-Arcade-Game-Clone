@@ -4,7 +4,7 @@ Recreation of the classic arcade game Galaxian.
 
 This implementation uses Object-Oriented Javascript and HTML5 Canvas.
 
-## Feautures:
+## Features:
 - Levels - Difficulty increments as level progresses. Each level ends with a boss enemy.
 - Score - Each fired misile that hits the enemy adds 100 points to the score.
 - Extra-rewards - Each spaceman gathered adds 500 points to the score.
