@@ -180,7 +180,6 @@ var Engine = (function(global) {
         checkCollisions(dt);
 
         scoreElement.innerHTML = score;
-        levelElement.innerHTML = level;
 
         if (enemyPool.getPool().length === 0) {
             spawnWave();
@@ -325,6 +324,7 @@ var Engine = (function(global) {
         ++level;
         if (level > 1) {
             variousSoundsPool.levelUp.play();
+            levelElement.innerHTML = level;
 
             level1Config.prizeSpeed = (difficultyLevels.easy + 1) * level1Config.prizeSpeed;
             level1Config.enemySpeed = (difficultyLevels.easy + 1) * level1Config.enemySpeed;
@@ -428,6 +428,8 @@ var Engine = (function(global) {
         for (var j = 0; j < 3; j++) {
             lifeImages[j].className = '';
         }
+
+        levelElement.innerHTML = '1';
 
         // Intializes game objects
         background = new Background(0, 0, ctxs.background);
