@@ -61,6 +61,8 @@ var Engine = (function(global) {
         canvasIDs = ['parallBackground', 'background', 'prize', 'main', 'spaceship'],
         canvasWidth = 720,
         canvasHeight = 432;
+        scoreElement = document.getElementById('score');
+        levelElement = document.getElementById('level');
 
 
 
@@ -177,8 +179,8 @@ var Engine = (function(global) {
     function update(dt) {
         checkCollisions(dt);
 
-        document.getElementById('score').innerHTML = score;
-        document.getElementById('level').innerHTML = level;
+        scoreElement.innerHTML = score;
+        levelElement.innerHTML = level;
 
         if (enemyPool.getPool().length === 0) {
             spawnWave();
