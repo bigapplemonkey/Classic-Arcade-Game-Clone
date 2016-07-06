@@ -60,9 +60,9 @@ var Engine = (function(global) {
         lifeImages = [],
         canvasIDs = ['parallBackground', 'background', 'prize', 'main', 'spaceship'],
         canvasWidth = 720,
-        canvasHeight = 432;
-        scoreElement = document.getElementById('score');
-        levelElement = document.getElementById('level');
+        canvasHeight = 432,
+        scoreElement = doc.getElementById('score'),
+        levelElement = doc.getElementById('level');
 
 
 
