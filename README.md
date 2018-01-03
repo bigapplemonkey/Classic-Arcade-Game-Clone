@@ -1,4 +1,4 @@
-# Frontend Nanodegree Project - Classic Arcade Game Clone
+# Classic Arcade Game Clone
 
 Recreation of the classic arcade game Galaxian.
 
